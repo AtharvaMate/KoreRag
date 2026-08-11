@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: rag_user
+      POSTGRES_PASSWORD: rag_password
+      POSTGRES_DB: rag_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB_URL: postgresql+psycopg://rag_user:rag_password@db:5432/rag_db
+    volumes:
+      - ./sample_kb:/app/sample_kb
+      - ./embedding_cache:/app/embedding_cache
+
+volumes:
+  pgdata:

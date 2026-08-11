@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Search — Knowledge Base</title>
+    <meta name="description" content="Multi-tenant RAG search over your organization's knowledge base">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+        <div class="auth-stripe"></div>
+        <div class="auth-body">
+            <h1 class="auth-title">RAG Search</h1>
+            <p class="auth-sub">Query your team's knowledge base</p>
+            <div class="auth-toggle">
+                <button class="auth-toggle-btn active" data-tab="login" onclick="switchAuthTab('login')">Sign in</button>
+                <button class="auth-toggle-btn" data-tab="register" onclick="switchAuthTab('register')">Register</button>
+            </div>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <label class="field-label">Username</label>
+                <input class="field" id="login-user" required autocomplete="username">
+                <label class="field-label">Password</label>
+                <input class="field" type="password" id="login-pass" required autocomplete="current-password">
+                <button class="btn-primary" type="submit">Sign in</button>
+            </form>
+            <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
+                <label class="field-label">Username</label>
+                <input class="field" id="reg-user" required autocomplete="username">
+                <label class="field-label">Password</label>
+                <input class="field" type="password" id="reg-pass" required autocomplete="new-password">
+                <label class="field-label">Tenant</label>
+                <select class="field" id="reg-tenant"></select>
+                <button class="btn-primary" type="submit">Create account</button>
+            </form>
+            <div id="auth-error" class="auth-error"></div>
+        </div>
+    </div>
+</div>
+
+<div id="app-screen" class="app-layout hidden">
+    <aside class="sidebar" id="sidebar">
+        <div class="sb-head">
+            <span class="sb-brand">⬡ RAG Search</span>
+            <span class="sb-tenant" id="sb-tenant"></span>
+        </div>
+        <div class="sb-tabs">
+            <button class="sb-tab active" data-tab="history" onclick="switchTab('history')">History</button>
+            <button class="sb-tab" data-tab="docs" onclick="switchTab('docs')">Documents</button>
+        </div>
+        <div class="sb-body">
+            <div id="panel-history" class="sb-panel">
+                <div id="history-list"></div>
+                <div id="history-empty" class="sb-empty">No history yet</div>
+            </div>
+            <div id="panel-docs" class="sb-panel hidden">
+                <div class="upload-zone">
+                    <input type="file" id="file-input" accept=".md" hidden>
+                    <button class="btn-upload" onclick="document.getElementById('file-input').click()">+ Upload .md</button>
+                </div>
+                <div id="doc-list"></div>
+                <div id="doc-empty" class="sb-empty">No documents uploaded</div>
+            </div>
+        </div>
+        <div class="sb-foot">
+            <span class="sb-avatar" id="sb-avatar"></span>
+            <span class="sb-username" id="sb-username"></span>
+            <button class="btn-logout" onclick="logout()" title="Sign out">✕</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <button class="btn-menu" id="btn-menu" onclick="toggleSidebar()">☰</button>
+            <span class="topbar-title">New query</span>
+        </header>
+        <div class="messages" id="messages">
+            <div id="empty-state" class="empty-state">
+                <div class="empty-hex">⬡</div>
+                <div class="empty-h">Ask your knowledge base</div>
+                <div class="empty-p">Answers are sourced from your tenant's documents with citations.</div>
+            </div>
+        </div>
+        <div class="input-area">
+            <form class="input-row" id="chat-form" onsubmit="handleSend(event)">
+                <input class="input-field" id="chat-input" placeholder="Ask a question…" autocomplete="off">
+                <button class="btn-send" type="submit" id="btn-send">→</button>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
