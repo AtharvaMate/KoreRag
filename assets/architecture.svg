@@ -1,134 +1,68 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="100%" height="100%">
-  <defs>
-    <!-- Background Gradient -->
-    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0a0a0a" />
-      <stop offset="100%" stop-color="#141414" />
-    </linearGradient>
+<svg width="100%" viewBox="0 0 680 610" role="img" style="" xmlns="http://www.w3.org/2000/svg">
+<title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">NexusRAG system architecture</title>
+<desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Client sends requests to a FastAPI gateway with JWT and tenant auth, which splits into a document ingestion pipeline and a query/hybrid retrieval pipeline, both backed by a Postgres and Qdrant storage layer, flowing through reranking and LLM generation to a final answer.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
 
-    <!-- Node Gradient -->
-    <linearGradient id="node-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1e1e1e" />
-      <stop offset="100%" stop-color="#2a2a2a" />
-    </linearGradient>
+<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+<rect x="240" y="40" width="200" height="50" rx="8" stroke-width="0.5" style="fill:rgb(241, 239, 232);stroke:rgb(95, 94, 90);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="340" y="58" text-anchor="middle" dominant-baseline="central" style="fill:rgb(68, 68, 65);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Client</text>
+<text x="340" y="76" text-anchor="middle" dominant-baseline="central" style="fill:rgb(95, 94, 90);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Web UI, SDK, curl</text>
+</g>
+<line x1="340" y1="90" x2="340" y2="118" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
 
-    <!-- Glowing Lines -->
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
+<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+<rect x="190" y="118" width="300" height="56" rx="8" stroke-width="0.5" style="fill:rgb(230, 241, 251);stroke:rgb(24, 95, 165);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="340" y="138" text-anchor="middle" dominant-baseline="central" style="fill:rgb(12, 68, 124);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">FastAPI gateway</text>
+<text x="340" y="156" text-anchor="middle" dominant-baseline="central" style="fill:rgb(24, 95, 165);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">JWT auth · tenant context</text>
+</g>
 
-    <!-- Box Shadow -->
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.6"/>
-    </filter>
+<path d="M340 174 L340 192 L185 192 L185 208" fill="none" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<path d="M340 174 L340 192 L455 192 L455 208" fill="none" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
 
-    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#8892b0" />
-    </marker>
-    <marker id="arrowhead-accent" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#64ffda" />
-    </marker>
-  </defs>
+<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+<rect x="60" y="208" width="250" height="56" rx="8" stroke-width="0.5" style="fill:rgb(225, 245, 238);stroke:rgb(15, 110, 86);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="185" y="228" text-anchor="middle" dominant-baseline="central" style="fill:rgb(8, 80, 65);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Ingestion pipeline</text>
+<text x="185" y="246" text-anchor="middle" dominant-baseline="central" style="fill:rgb(15, 110, 86);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Semantic chunk + embed docs</text>
+</g>
 
-  <!-- Background -->
-  <rect width="1000" height="600" fill="url(#bg-grad)" rx="16" />
+<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+<rect x="330" y="208" width="250" height="56" rx="8" stroke-width="0.5" style="fill:rgb(250, 236, 231);stroke:rgb(153, 60, 29);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="455" y="228" text-anchor="middle" dominant-baseline="central" style="fill:rgb(113, 43, 19);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Hybrid retrieval</text>
+<text x="455" y="246" text-anchor="middle" dominant-baseline="central" style="fill:rgb(153, 60, 29);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Dense (Qdrant) + sparse (BM25)</text>
+</g>
 
-  <!-- Grid Pattern overlay -->
-  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.03" stroke-width="1"/>
-  </pattern>
-  <rect width="1000" height="600" fill="url(#grid)" rx="16" />
+<line x1="185" y1="264" x2="185" y2="300" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
 
-  <!-- Title -->
-  <text x="500" y="50" font-family="'Inter', sans-serif" font-size="24" font-weight="700" fill="#e2e8f0" text-anchor="middle" letter-spacing="1.5">MULTI-TENANT RAG ARCHITECTURE</text>
-  <line x1="380" y1="65" x2="620" y2="65" stroke="#64ffda" stroke-width="2" />
+<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+<rect x="60" y="300" width="250" height="70" rx="8" stroke-width="0.5" style="fill:rgb(238, 237, 254);stroke:rgb(83, 74, 183);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="185" y="322" text-anchor="middle" dominant-baseline="central" style="fill:rgb(60, 52, 137);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Storage layer</text>
+<text x="185" y="342" text-anchor="middle" dominant-baseline="central" style="fill:rgb(83, 74, 183);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Postgres record manager</text>
+<text x="185" y="358" text-anchor="middle" dominant-baseline="central" style="fill:rgb(83, 74, 183);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Qdrant vector store</text>
+</g>
 
-  <!-- Groups/Boxes -->
-  
-  <!-- 1. Client -->
-  <g transform="translate(50, 250)" filter="url(#shadow)">
-    <rect width="160" height="100" rx="12" fill="url(#node-grad)" stroke="#334155" stroke-width="2" />
-    <circle cx="80" cy="35" r="16" fill="#2563eb" fill-opacity="0.2" stroke="#3b82f6" stroke-width="2" />
-    <text x="80" y="41" font-family="sans-serif" font-size="14" fill="#60a5fa" text-anchor="middle" font-weight="bold">WEB</text>
-    <text x="80" y="70" font-family="'Inter', sans-serif" font-size="16" font-weight="600" fill="#f8fafc" text-anchor="middle">Client App</text>
-    <text x="80" y="88" font-family="'Inter', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">React / Vue / HTML</text>
-  </g>
+<path d="M300 300 L300 280 L330 280 L330 264" fill="none" stroke="var(--t)" stroke-width="0.5" stroke-dasharray="4 3" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-dasharray:4px, 3px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
 
-  <!-- 2. API Layer -->
-  <g transform="translate(300, 150)" filter="url(#shadow)">
-    <rect width="200" height="300" rx="12" fill="url(#node-grad)" stroke="#10b981" stroke-width="2" />
-    <text x="400" y="180" font-family="'Inter', sans-serif" font-size="18" font-weight="700" fill="#f8fafc" text-anchor="middle">FastAPI Server</text>
-    <rect x="320" y="210" width="160" height="40" rx="6" fill="#1e293b" />
-    <text x="400" y="235" font-family="'Inter', sans-serif" font-size="14" fill="#cbd5e1" text-anchor="middle">Auth &amp; Tenants (JWT)</text>
-    
-    <rect x="320" y="260" width="160" height="40" rx="6" fill="#1e293b" />
-    <text x="400" y="285" font-family="'Inter', sans-serif" font-size="14" fill="#cbd5e1" text-anchor="middle">Document Chunker</text>
+<line x1="455" y1="264" x2="455" y2="350" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
 
-    <rect x="320" y="310" width="160" height="40" rx="6" fill="#1e293b" />
-    <text x="400" y="335" font-family="'Inter', sans-serif" font-size="14" fill="#cbd5e1" text-anchor="middle">Hybrid Retriever</text>
+<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+<rect x="330" y="350" width="250" height="56" rx="8" stroke-width="0.5" style="fill:rgb(250, 236, 231);stroke:rgb(153, 60, 29);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="455" y="370" text-anchor="middle" dominant-baseline="central" style="fill:rgb(113, 43, 19);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Cross-encoder rerank</text>
+<text x="455" y="388" text-anchor="middle" dominant-baseline="central" style="fill:rgb(153, 60, 29);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">BAAI/bge-reranker-base</text>
+</g>
 
-    <rect x="320" y="360" width="160" height="40" rx="6" fill="#1e293b" />
-    <text x="400" y="385" font-family="'Inter', sans-serif" font-size="14" fill="#cbd5e1" text-anchor="middle">Cross-Encoder Reranker</text>
-  </g>
+<line x1="455" y1="406" x2="455" y2="430" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
 
-  <!-- 3. Vector DB -->
-  <g transform="translate(650, 100)" filter="url(#shadow)">
-    <rect width="250" height="120" rx="12" fill="url(#node-grad)" stroke="#ec4899" stroke-width="2" />
-    <!-- Cylinder Icon -->
-    <path d="M 680 130 C 680 125, 710 125, 710 130 C 710 135, 680 135, 680 130 Z" fill="#ec4899" fill-opacity="0.2" stroke="#ec4899" stroke-width="2" />
-    <path d="M 680 130 L 680 150 C 680 155, 710 155, 710 150 L 710 130" fill="#ec4899" fill-opacity="0.1" stroke="#ec4899" stroke-width="2" />
-    
-    <text x="775" y="145" font-family="'Inter', sans-serif" font-size="18" font-weight="700" fill="#f8fafc" text-anchor="middle">Qdrant DB</text>
-    <text x="775" y="170" font-family="'Inter', sans-serif" font-size="13" fill="#94a3b8" text-anchor="middle">Vector Embeddings</text>
-    <text x="775" y="190" font-family="'Inter', sans-serif" font-size="13" fill="#94a3b8" text-anchor="middle">(BM25 + Dense)</text>
-  </g>
+<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+<rect x="330" y="430" width="250" height="56" rx="8" stroke-width="0.5" style="fill:rgb(250, 236, 231);stroke:rgb(153, 60, 29);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="455" y="450" text-anchor="middle" dominant-baseline="central" style="fill:rgb(113, 43, 19);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">LLM generation</text>
+<text x="455" y="468" text-anchor="middle" dominant-baseline="central" style="fill:rgb(153, 60, 29);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Groq gpt-oss-120b</text>
+</g>
 
-  <!-- 4. Relational DB -->
-  <g transform="translate(650, 260)" filter="url(#shadow)">
-    <rect width="250" height="120" rx="12" fill="url(#node-grad)" stroke="#3b82f6" stroke-width="2" />
-    <!-- Cylinder Icon -->
-    <path d="M 680 290 C 680 285, 710 285, 710 290 C 710 295, 680 295, 680 290 Z" fill="#3b82f6" fill-opacity="0.2" stroke="#3b82f6" stroke-width="2" />
-    <path d="M 680 290 L 680 310 C 680 315, 710 315, 710 310 L 710 290" fill="#3b82f6" fill-opacity="0.1" stroke="#3b82f6" stroke-width="2" />
-    
-    <text x="775" y="305" font-family="'Inter', sans-serif" font-size="18" font-weight="700" fill="#f8fafc" text-anchor="middle">PostgreSQL</text>
-    <text x="775" y="330" font-family="'Inter', sans-serif" font-size="13" fill="#94a3b8" text-anchor="middle">Tenants &amp; Users</text>
-    <text x="775" y="350" font-family="'Inter', sans-serif" font-size="13" fill="#94a3b8" text-anchor="middle">Document Metadata</text>
-  </g>
+<line x1="455" y1="486" x2="455" y2="510" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
 
-  <!-- 5. LLM Provider -->
-  <g transform="translate(650, 420)" filter="url(#shadow)">
-    <rect width="250" height="120" rx="12" fill="url(#node-grad)" stroke="#f59e0b" stroke-width="2" />
-    <!-- AI Brain or Sparks -->
-    <circle cx="695" cy="460" r="14" fill="#f59e0b" fill-opacity="0.2" stroke="#f59e0b" stroke-width="2" />
-    
-    <text x="775" y="465" font-family="'Inter', sans-serif" font-size="18" font-weight="700" fill="#f8fafc" text-anchor="middle">Groq (LLM)</text>
-    <text x="775" y="490" font-family="'Inter', sans-serif" font-size="13" fill="#94a3b8" text-anchor="middle">OpenAI GPT-OSS / Llama3</text>
-    <text x="775" y="510" font-family="'Inter', sans-serif" font-size="13" fill="#94a3b8" text-anchor="middle">Generation &amp; QA</text>
-  </g>
-
-  <!-- Connection Lines -->
-  
-  <!-- Client to API -->
-  <path d="M 210 300 L 300 300" fill="none" stroke="#64ffda" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrowhead-accent)" filter="url(#glow)" />
-  <text x="255" y="290" font-family="'Inter', sans-serif" font-size="12" fill="#64ffda" text-anchor="middle">HTTP/JSON</text>
-
-  <!-- API to Qdrant -->
-  <path d="M 500 210 L 575 210 L 575 160 L 650 160" fill="none" stroke="#8892b0" stroke-width="2" marker-end="url(#arrowhead)" />
-  <text x="575" y="150" font-family="'Inter', sans-serif" font-size="12" fill="#8892b0" text-anchor="middle">Search / Index</text>
-
-  <!-- API to Postgres -->
-  <path d="M 500 300 L 650 300" fill="none" stroke="#8892b0" stroke-width="2" marker-end="url(#arrowhead)" />
-  <text x="575" y="290" font-family="'Inter', sans-serif" font-size="12" fill="#8892b0" text-anchor="middle">SQLAlchemy</text>
-
-  <!-- API to Groq -->
-  <path d="M 500 390 L 575 390 L 575 480 L 650 480" fill="none" stroke="#8892b0" stroke-width="2" marker-end="url(#arrowhead)" />
-  <text x="575" y="470" font-family="'Inter', sans-serif" font-size="12" fill="#8892b0" text-anchor="middle">LangChain</text>
-
-  <!-- Decorative elements -->
-  <circle cx="10" cy="10" r="2" fill="#334155" />
-  <circle cx="990" cy="10" r="2" fill="#334155" />
-  <circle cx="10" cy="590" r="2" fill="#334155" />
-  <circle cx="990" cy="590" r="2" fill="#334155" />
-
+<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+<rect x="330" y="510" width="250" height="50" rx="8" stroke-width="0.5" style="fill:rgb(241, 239, 232);stroke:rgb(95, 94, 90);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+<text x="455" y="528" text-anchor="middle" dominant-baseline="central" style="fill:rgb(68, 68, 65);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Response</text>
+<text x="455" y="546" text-anchor="middle" dominant-baseline="central" style="fill:rgb(95, 94, 90);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Streamed back to client</text>
+</g>
 </svg>
