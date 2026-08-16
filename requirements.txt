@@ -18,7 +18,7 @@ numpy
 pyjwt
 bcrypt
 sqlalchemy
-psycopg2-binary
+psycopg[binary]
 asyncpg
 python-multipart
 aiofiles
