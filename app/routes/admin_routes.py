@@ -66,12 +66,34 @@ async def delete_tenant(
     if not tenant:
         raise HTTPException(404, "Tenant not found")
 
-    # Cascade-delete all dependent records
+    # Prevent deleting the tenant that the admin user belongs to
+    if admin.tenant_id == tenant_id:
+        # Reassign admin to another tenant before proceeding
+        other_tenant_result = await db.execute(
+            select(Tenant).where(Tenant.id != tenant_id).limit(1)
+        )
+        other_tenant = other_tenant_result.scalar_one_or_none()
+        if not other_tenant:
+            raise HTTPException(
+                400,
+                "Cannot delete the last remaining tenant. At least one tenant must exist.",
+            )
+        admin.tenant_id = other_tenant.id
+        await db.flush()
+
+    # Cascade-delete all dependent records (skip the admin user)
     from app.database import ChatMessage
-    for model in [ChatMessage, Document, KnowledgeBase, User]:
+    for model in [ChatMessage, Document, KnowledgeBase]:
         rows = await db.execute(select(model).where(model.tenant_id == tenant_id))
         for row in rows.scalars().all():
             await db.delete(row)
+
+    # Delete non-admin users on this tenant
+    user_rows = await db.execute(
+        select(User).where(User.tenant_id == tenant_id, User.id != admin.id)
+    )
+    for row in user_rows.scalars().all():
+        await db.delete(row)
 
     await db.delete(tenant)
     await db.commit()

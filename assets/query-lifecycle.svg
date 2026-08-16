@@ -1,117 +1,172 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 500" width="100%" height="100%" style="font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;">
+  <title>Nexus RAG — Single Query Lifecycle</title>
+  <desc>Traces one RAG query end to end: User Query → HyDE Embedding → Hybrid Retrieval (Dense + Sparse) → Candidate Chunks → Cross-Encoder Reranking → Top-5 Context → LLM Generation → Cited Answer.</desc>
+
   <defs>
-    <!-- Background Gradient -->
-    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0a0a0a" />
-      <stop offset="100%" stop-color="#141414" />
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#141418"/>
     </linearGradient>
-
-    <!-- Node Gradients -->
-    <linearGradient id="node-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1e293b" />
-      <stop offset="100%" stop-color="#334155" />
+    <linearGradient id="node" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#334155"/>
     </linearGradient>
-
-    <linearGradient id="highlight-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#10b981" />
-      <stop offset="100%" stop-color="#059669" />
+    <linearGradient id="llm" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
     </linearGradient>
-
-    <linearGradient id="llm-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f59e0b" />
-      <stop offset="100%" stop-color="#d97706" />
-    </linearGradient>
-
-    <!-- Glowing Lines -->
+    <filter id="s" x="-8%" y="-10%" width="116%" height="124%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
     <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feComposite in="SourceGraphic" in2="b" operator="over"/>
     </filter>
-
-    <!-- Box Shadow -->
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.6"/>
-    </filter>
-
-    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+    <marker id="ah" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#94a3b8"/>
     </marker>
-    <marker id="arrowhead-highlight" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#64ffda" />
+    <marker id="ahc" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#64ffda"/>
     </marker>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0L0 0 0 40" fill="none" stroke="#fff" stroke-opacity="0.02" stroke-width="1"/>
+    </pattern>
   </defs>
 
   <!-- Background -->
-  <rect width="900" height="450" fill="url(#bg-grad)" rx="16" />
-
-  <!-- Grid Pattern overlay -->
-  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.03" stroke-width="1"/>
-  </pattern>
-  <rect width="900" height="450" fill="url(#grid)" rx="16" />
+  <rect width="940" height="500" fill="url(#bg)" rx="14"/>
+  <rect width="940" height="500" fill="url(#grid)" rx="14"/>
 
   <!-- Title -->
-  <text x="450" y="45" font-family="'Inter', sans-serif" font-size="22" font-weight="700" fill="#e2e8f0" text-anchor="middle" letter-spacing="1.5">QUERY LIFECYCLE: END-TO-END RAG FLOW</text>
-  <line x1="320" y1="60" x2="580" y2="60" stroke="#64ffda" stroke-width="2" />
+  <text x="470" y="40" text-anchor="middle" font-size="20" font-weight="700" fill="#e2e8f0" letter-spacing="1.5">QUERY LIFECYCLE: END-TO-END RAG FLOW</text>
+  <line x1="310" y1="54" x2="630" y2="54" stroke="#64ffda" stroke-width="2"/>
 
-  <!-- 1. Query Input -->
-  <g transform="translate(40, 150)" filter="url(#shadow)">
-    <rect width="140" height="80" rx="12" fill="url(#node-grad)" stroke="#3b82f6" stroke-width="2" />
-    <circle cx="70" cy="30" r="14" fill="#3b82f6" fill-opacity="0.2" stroke="#60a5fa" stroke-width="2" />
-    <text x="70" y="35" font-family="sans-serif" font-size="12" fill="#60a5fa" text-anchor="middle" font-weight="bold">Q</text>
-    <text x="70" y="65" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#f8fafc" text-anchor="middle">User Query</text>
+  <!-- ─── STEP NUMBERS (top row) ─── -->
+  <!-- Positioned above each node -->
+
+  <!-- ════════ 1. USER QUERY ════════ -->
+  <g filter="url(#s)">
+    <rect x="28" y="140" width="130" height="90" rx="12" fill="url(#node)" stroke="#3b82f6" stroke-width="1.5"/>
+    <circle cx="93" cy="170" r="16" fill="rgba(59,130,246,0.15)" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="93" y="175" text-anchor="middle" fill="#60a5fa" font-size="13" font-weight="700">Q</text>
+    <text x="93" y="205" text-anchor="middle" fill="#f1f5f9" font-size="12" font-weight="600">User Query</text>
+    <text x="93" y="220" text-anchor="middle" fill="#64748b" font-size="9">"How does X work?"</text>
   </g>
+  <!-- Step label -->
+  <text x="93" y="128" text-anchor="middle" fill="#3b82f6" font-size="10" font-weight="700">STEP 1</text>
 
-  <!-- Connection: Query to Hybrid Retrieval -->
-  <path d="M 180 190 L 250 190" fill="none" stroke="#64ffda" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrowhead-highlight)" filter="url(#glow)" />
-  <text x="215" y="180" font-family="'Inter', sans-serif" font-size="12" fill="#64ffda" text-anchor="middle">Embed</text>
+  <!-- Arrow 1→2 -->
+  <path d="M158 185 L192 185" fill="none" stroke="#64ffda" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#ahc)" filter="url(#glow)"/>
+  <text x="175" y="176" text-anchor="middle" fill="#64ffda" font-size="9">embed</text>
 
-  <!-- 2. Hybrid Retrieval -->
-  <g transform="translate(250, 100)" filter="url(#shadow)">
-    <rect width="180" height="180" rx="12" fill="url(#node-grad)" stroke="#8b5cf6" stroke-width="2" />
-    <text x="340" y="130" font-family="'Inter', sans-serif" font-size="16" font-weight="700" fill="#f8fafc" text-anchor="middle">Hybrid Retrieval</text>
-    
-    <rect x="270" y="150" width="140" height="40" rx="6" fill="#1e293b" stroke="#a78bfa" stroke-width="1" />
-    <text x="340" y="175" font-family="'Inter', sans-serif" font-size="13" fill="#cbd5e1" text-anchor="middle">Dense (Qdrant)</text>
-
-    <text x="340" y="210" font-family="'Inter', sans-serif" font-size="14" font-weight="bold" fill="#94a3b8" text-anchor="middle">+</text>
-
-    <rect x="270" y="220" width="140" height="40" rx="6" fill="#1e293b" stroke="#a78bfa" stroke-width="1" />
-    <text x="340" y="245" font-family="'Inter', sans-serif" font-size="13" fill="#cbd5e1" text-anchor="middle">Sparse (BM25)</text>
+  <!-- ════════ 2. HyDE ════════ -->
+  <g filter="url(#s)">
+    <rect x="198" y="120" width="150" height="130" rx="12" fill="url(#node)" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="273" y="148" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="700">HyDE</text>
+    <text x="273" y="164" text-anchor="middle" fill="#a78bfa" font-size="9">Hypothetical Doc Embedding</text>
+    <!-- sub-steps -->
+    <rect x="213" y="176" width="120" height="26" rx="5" fill="#1e293b" stroke="#a78bfa" stroke-width="0.8"/>
+    <text x="273" y="193" text-anchor="middle" fill="#c4b5fd" font-size="10">LLM → Fake Doc</text>
+    <rect x="213" y="210" width="120" height="26" rx="5" fill="#1e293b" stroke="#a78bfa" stroke-width="0.8"/>
+    <text x="273" y="227" text-anchor="middle" fill="#c4b5fd" font-size="10">Embed Passage</text>
   </g>
+  <text x="273" y="108" text-anchor="middle" fill="#8b5cf6" font-size="10" font-weight="700">STEP 2</text>
 
-  <!-- Connection: Retrieval to Reranker (Multiple chunks) -->
-  <path d="M 430 160 L 510 170" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowhead)" />
-  <path d="M 430 190 L 510 190" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowhead)" />
-  <path d="M 430 220 L 510 210" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowhead)" />
-  <text x="470" y="150" font-family="'Inter', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Top 15 Chunks</text>
+  <!-- Arrow 2→3 (multiple fan-out lines) -->
+  <path d="M348 155 L393 155" fill="none" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#ah)"/>
+  <path d="M348 185 L393 185" fill="none" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#ah)"/>
+  <path d="M348 215 L393 215" fill="none" stroke="#94a3b8" stroke-width="1.2" marker-end="url(#ah)"/>
 
-  <!-- 3. Reranker -->
-  <g transform="translate(510, 110)" filter="url(#shadow)">
-    <rect width="160" height="160" rx="12" fill="url(#node-grad)" stroke="#ec4899" stroke-width="2" />
-    <text x="590" y="145" font-family="'Inter', sans-serif" font-size="16" font-weight="700" fill="#f8fafc" text-anchor="middle">Reranker</text>
-    <text x="590" y="165" font-family="'Inter', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Cross-Encoder</text>
-    
-    <path d="M 550 190 L 630 190 M 560 210 L 620 210 M 570 230 L 610 230" fill="none" stroke="#ec4899" stroke-width="3" />
-    <polygon points="590,250 580,240 600,240" fill="#ec4899" />
+  <!-- ════════ 3. HYBRID RETRIEVAL ════════ -->
+  <g filter="url(#s)">
+    <rect x="399" y="110" width="150" height="150" rx="12" fill="url(#node)" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="474" y="138" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="700">Hybrid Retrieval</text>
+    <text x="474" y="154" text-anchor="middle" fill="#94a3b8" font-size="9">EnsembleRetriever</text>
+
+    <rect x="414" y="166" width="120" height="28" rx="5" fill="#1e293b" stroke="#a78bfa" stroke-width="0.8"/>
+    <text x="474" y="184" text-anchor="middle" fill="#c4b5fd" font-size="10">Dense (Qdrant)</text>
+    <text x="474" y="207" text-anchor="middle" fill="#64748b" font-size="14" font-weight="700">+</text>
+    <rect x="414" y="218" width="120" height="28" rx="5" fill="#1e293b" stroke="#a78bfa" stroke-width="0.8"/>
+    <text x="474" y="236" text-anchor="middle" fill="#c4b5fd" font-size="10">Sparse (BM25)</text>
   </g>
+  <text x="474" y="98" text-anchor="middle" fill="#8b5cf6" font-size="10" font-weight="700">STEP 3</text>
 
-  <!-- Connection: Reranker to LLM -->
-  <path d="M 670 190 L 730 190" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead)" filter="url(#glow)"/>
-  <text x="700" y="180" font-family="'Inter', sans-serif" font-size="12" fill="#10b981" text-anchor="middle">Top 5 Context</text>
+  <!-- Arrow 3→4 with chunk count -->
+  <path d="M549 185 L593 185" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ah)"/>
+  <text x="571" y="176" text-anchor="middle" fill="#94a3b8" font-size="9">~15 chunks</text>
 
-  <!-- 4. LLM Generation -->
-  <g transform="translate(730, 130)" filter="url(#shadow)">
-    <rect width="140" height="120" rx="12" fill="url(#llm-grad)" stroke="#fbbf24" stroke-width="2" />
-    <text x="800" y="170" font-family="'Inter', sans-serif" font-size="20" font-weight="800" fill="#fff" text-anchor="middle">Groq</text>
-    <text x="800" y="195" font-family="'Inter', sans-serif" font-size="12" fill="#fef3c7" text-anchor="middle">LLM Generation</text>
-    
-    <rect x="750" y="210" width="100" height="20" rx="4" fill="#000" fill-opacity="0.3" />
-    <text x="800" y="224" font-family="'Inter', sans-serif" font-size="10" fill="#fff" text-anchor="middle">Prompt + Context</text>
+  <!-- ════════ 4. RERANKER ════════ -->
+  <g filter="url(#s)">
+    <rect x="599" y="120" width="140" height="130" rx="12" fill="url(#node)" stroke="#ec4899" stroke-width="1.5"/>
+    <text x="669" y="148" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="700">Reranker</text>
+    <text x="669" y="164" text-anchor="middle" fill="#f9a8d4" font-size="9">Cross-Encoder</text>
+    <text x="669" y="178" text-anchor="middle" fill="#64748b" font-size="9">bge-reranker-base</text>
+
+    <!-- Visual: bars getting shorter = filtering -->
+    <line x1="630" y1="196" x2="708" y2="196" stroke="#ec4899" stroke-width="3" stroke-linecap="round"/>
+    <line x1="638" y1="208" x2="700" y2="208" stroke="#ec4899" stroke-width="3" stroke-linecap="round" stroke-opacity="0.7"/>
+    <line x1="646" y1="220" x2="692" y2="220" stroke="#ec4899" stroke-width="3" stroke-linecap="round" stroke-opacity="0.5"/>
+    <line x1="654" y1="232" x2="684" y2="232" stroke="#ec4899" stroke-width="3" stroke-linecap="round" stroke-opacity="0.3"/>
+    <!-- Funnel arrow -->
+    <polygon points="669,242 658,236 680,236" fill="#ec4899" fill-opacity="0.6"/>
   </g>
+  <text x="669" y="108" text-anchor="middle" fill="#ec4899" font-size="10" font-weight="700">STEP 4</text>
 
-  <!-- Return Path to User -->
-  <path d="M 800 250 L 800 340 L 110 340 L 110 230" fill="none" stroke="#64ffda" stroke-width="2" stroke-dasharray="8,4" marker-end="url(#arrowhead-highlight)" filter="url(#glow)" />
-  <text x="450" y="330" font-family="'Inter', sans-serif" font-size="14" font-weight="bold" fill="#64ffda" text-anchor="middle">Final Answer (Synthesized &amp; Grounded)</text>
+  <!-- Arrow 4→5 -->
+  <path d="M739 185 L793 185" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#ah)" filter="url(#glow)"/>
+  <text x="766" y="176" text-anchor="middle" fill="#10b981" font-size="9">Top 5</text>
+
+  <!-- ════════ 5. LLM GENERATION ════════ -->
+  <g filter="url(#s)">
+    <rect x="799" y="130" width="120" height="110" rx="12" fill="url(#llm)" stroke="#fbbf24" stroke-width="1.5"/>
+    <text x="859" y="164" text-anchor="middle" fill="#fff" font-size="18" font-weight="800">Groq</text>
+    <text x="859" y="184" text-anchor="middle" fill="#fef3c7" font-size="10">LLM Generation</text>
+    <rect x="814" y="196" width="90" height="20" rx="4" fill="rgba(0,0,0,0.25)"/>
+    <text x="859" y="210" text-anchor="middle" fill="#fff" font-size="9">Context + Prompt</text>
+    <text x="859" y="230" text-anchor="middle" fill="#fef3c7" font-size="8">gpt-oss-120b</text>
+  </g>
+  <text x="859" y="118" text-anchor="middle" fill="#f59e0b" font-size="10" font-weight="700">STEP 5</text>
+
+  <!-- ════════ RETURN PATH ════════ -->
+  <path d="M859 240 L859 330 Q859 345 844 345 L93 345 Q78 345 78 330 L78 230" fill="none" stroke="#64ffda" stroke-width="2" stroke-dasharray="8 5" marker-end="url(#ahc)" filter="url(#glow)"/>
+  <text x="470" y="338" text-anchor="middle" fill="#64ffda" font-size="13" font-weight="700">Final Answer — Source-Cited &amp; Context-Grounded</text>
+
+  <!-- ════════ BOTTOM: PIPELINE SUMMARY ════════ -->
+  <rect x="80" y="390" width="780" height="90" rx="12" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- 5 columns inside -->
+  <text x="470" y="414" text-anchor="middle" fill="#64748b" font-size="10" font-weight="600" letter-spacing="1">PIPELINE COMPONENTS</text>
+  <line x1="100" y1="424" x2="840" y2="424" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- Col 1 -->
+  <text x="168" y="444" text-anchor="middle" fill="#60a5fa" font-size="11" font-weight="600">Embedding</text>
+  <text x="168" y="460" text-anchor="middle" fill="#475569" font-size="9">bge-large-en-v1.5</text>
+  <text x="168" y="473" text-anchor="middle" fill="#475569" font-size="9">1024-dim · normalized</text>
+
+  <!-- Col 2 -->
+  <text x="316" y="444" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="600">Retrieval</text>
+  <text x="316" y="460" text-anchor="middle" fill="#475569" font-size="9">HyDE + BM25 fusion</text>
+  <text x="316" y="473" text-anchor="middle" fill="#475569" font-size="9">Weights: 0.6 / 0.4</text>
+
+  <!-- Col 3 -->
+  <text x="470" y="444" text-anchor="middle" fill="#f9a8d4" font-size="11" font-weight="600">Reranking</text>
+  <text x="470" y="460" text-anchor="middle" fill="#475569" font-size="9">bge-reranker-base</text>
+  <text x="470" y="473" text-anchor="middle" fill="#475569" font-size="9">Cross-encoder · top-5</text>
+
+  <!-- Col 4 -->
+  <text x="624" y="444" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Generation</text>
+  <text x="624" y="460" text-anchor="middle" fill="#475569" font-size="9">Groq gpt-oss-120b</text>
+  <text x="624" y="473" text-anchor="middle" fill="#475569" font-size="9">Cited answers only</text>
+
+  <!-- Col 5 -->
+  <text x="772" y="444" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="600">Caching</text>
+  <text x="772" y="460" text-anchor="middle" fill="#475569" font-size="9">Redis · SHA-256 keys</text>
+  <text x="772" y="473" text-anchor="middle" fill="#475569" font-size="9">Tenant-scoped TTL</text>
+
+  <!-- Vertical separators between columns -->
+  <line x1="242" y1="432" x2="242" y2="476" stroke="#1e293b" stroke-width="1"/>
+  <line x1="392" y1="432" x2="392" y2="476" stroke="#1e293b" stroke-width="1"/>
+  <line x1="546" y1="432" x2="546" y2="476" stroke="#1e293b" stroke-width="1"/>
+  <line x1="698" y1="432" x2="698" y2="476" stroke="#1e293b" stroke-width="1"/>
 
 </svg>

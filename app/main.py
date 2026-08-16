@@ -29,21 +29,41 @@ async def seed_tenants():
 
 
 async def seed_admin():
-    """Create the hardcoded admin user if it doesn't exist."""
+    """Create or repair the hardcoded admin user.
+
+    Handles three failure modes:
+      1. Admin user doesn't exist → create it.
+      2. Admin user exists but its tenant was deleted → reassign to a valid tenant.
+      3. Admin user exists and is healthy → no-op.
+    """
     async with SessionLocal() as db:
-        result = await db.execute(select(User).where(User.username == ADMIN_USERNAME))
-        if result.scalar_one_or_none() is None:
-            # Assign to first tenant
-            tenant_result = await db.execute(select(Tenant).limit(1))
-            tenant = tenant_result.scalar_one_or_none()
-            if tenant:
-                admin = User(
-                    username=ADMIN_USERNAME,
-                    password_hash=hash_password(ADMIN_PASSWORD),
-                    tenant_id=tenant.id,
-                    is_admin=True,
-                )
-                db.add(admin)
+        result = await db.execute(
+            select(User).where(User.username == ADMIN_USERNAME)
+        )
+        existing_admin = result.scalar_one_or_none()
+
+        tenant_result = await db.execute(select(Tenant).limit(1))
+        tenant = tenant_result.scalar_one_or_none()
+        if not tenant:
+            return  # No tenants seeded yet — nothing to attach to
+
+        if existing_admin is None:
+            # Case 1: admin user was deleted — re-create it
+            admin = User(
+                username=ADMIN_USERNAME,
+                password_hash=hash_password(ADMIN_PASSWORD),
+                tenant_id=tenant.id,
+                is_admin=True,
+            )
+            db.add(admin)
+            await db.commit()
+        else:
+            # Case 2: admin exists — make sure their tenant is still valid
+            tenant_check = await db.execute(
+                select(Tenant).where(Tenant.id == existing_admin.tenant_id)
+            )
+            if tenant_check.scalar_one_or_none() is None:
+                existing_admin.tenant_id = tenant.id
                 await db.commit()
 
 
