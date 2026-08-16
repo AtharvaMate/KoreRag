@@ -306,14 +306,3 @@ Feel free to check the [issues page](https://github.com/AtharvaMate/NexusRag/iss
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a pull request
 
----
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
-<div align="center">
-  <sub>Built with ❤️ by <a href="https://github.com/AtharvaMate">Atharva Mate</a> — for modern GenAI applications.</sub>
-</div>
