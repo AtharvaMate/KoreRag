@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel — RAG Knowledge Base Manager</title>
+    <meta name="description" content="Admin panel for managing tenants, knowledge bases, and .md document uploads">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+
+<!-- Login Gate -->
+<div id="admin-login" class="login-screen">
+    <div class="login-card">
+        <div class="login-stripe"></div>
+        <div class="login-body">
+            <div class="login-badge">⚙ ADMIN</div>
+            <h1 class="login-title">Admin Panel</h1>
+            <p class="login-sub">Sign in with your admin credentials</p>
+            <form id="login-form" onsubmit="handleAdminLogin(event)">
+                <label class="field-label">Username</label>
+                <input class="field" id="login-user" required autocomplete="username" value="admin">
+                <label class="field-label">Password</label>
+                <input class="field" type="password" id="login-pass" required autocomplete="current-password">
+                <button class="btn-primary" type="submit" id="login-btn">Sign in</button>
+            </form>
+            <div id="login-error" class="login-error"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Panel -->
+<div id="admin-panel" class="admin-panel hidden">
+    <!-- Top Bar -->
+    <header class="admin-topbar">
+        <div class="topbar-left">
+            <a href="/" class="topbar-back" title="Back to Chat">←</a>
+            <span class="topbar-brand">⬡ RAG Admin</span>
+            <span class="topbar-badge">ADMIN</span>
+        </div>
+        <div class="topbar-right">
+            <div class="tenant-switcher">
+                <label class="tenant-label">Active Tenant</label>
+                <select id="tenant-select" class="tenant-dropdown" onchange="onTenantSwitch()"></select>
+            </div>
+            <span class="topbar-user" id="topbar-user"></span>
+            <button class="btn-sign-out" onclick="adminLogout()" title="Sign out">Sign out</button>
+        </div>
+    </header>
+
+    <div class="admin-body">
+        <!-- Sidebar Nav -->
+        <nav class="admin-nav">
+            <button class="nav-btn active" data-section="knowledge-bases" onclick="switchSection('knowledge-bases')">
+                <span class="nav-icon">📚</span> Knowledge Bases
+            </button>
+            <button class="nav-btn" data-section="tenants" onclick="switchSection('tenants')">
+                <span class="nav-icon">🏢</span> Tenants
+            </button>
+        </nav>
+
+        <!-- Content -->
+        <main class="admin-content">
+            <!-- Knowledge Bases Section -->
+            <section id="section-knowledge-bases" class="section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Knowledge Bases</h2>
+                        <p class="section-desc">Create and manage knowledge bases, upload .md documents</p>
+                    </div>
+                    <button class="btn-action" onclick="openCreateKBModal()">+ New Knowledge Base</button>
+                </div>
+
+                <div id="kb-grid" class="kb-grid">
+                    <!-- KB cards rendered by JS -->
+                </div>
+                <div id="kb-empty" class="empty-state">
+                    <div class="empty-icon">📚</div>
+                    <div class="empty-title">No knowledge bases yet</div>
+                    <div class="empty-desc">Create your first knowledge base to start uploading documents</div>
+                </div>
+            </section>
+
+            <!-- Tenants Section -->
+            <section id="section-tenants" class="section hidden">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Tenant Management</h2>
+                        <p class="section-desc">Create and manage tenants for your organization</p>
+                    </div>
+                    <button class="btn-action" onclick="openCreateTenantModal()">+ New Tenant</button>
+                </div>
+
+                <div id="tenant-list" class="tenant-list">
+                    <!-- Tenant rows rendered by JS -->
+                </div>
+                <div id="tenant-empty" class="empty-state">
+                    <div class="empty-icon">🏢</div>
+                    <div class="empty-title">No tenants</div>
+                    <div class="empty-desc">No tenants found in the system</div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<!-- Create KB Modal -->
+<div id="modal-create-kb" class="modal-overlay hidden" onclick="closeModal(event, 'modal-create-kb')">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">Create Knowledge Base</h3>
+            <button class="modal-close" onclick="hideModal('modal-create-kb')">✕</button>
+        </div>
+        <form onsubmit="handleCreateKB(event)">
+            <label class="field-label">Name</label>
+            <input class="field" id="kb-name" required placeholder="e.g. Product Documentation">
+            <label class="field-label">Tenant</label>
+            <select class="field" id="kb-tenant"></select>
+            <button class="btn-primary" type="submit">Create</button>
+        </form>
+    </div>
+</div>
+
+<!-- Create Tenant Modal -->
+<div id="modal-create-tenant" class="modal-overlay hidden" onclick="closeModal(event, 'modal-create-tenant')">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">Create Tenant</h3>
+            <button class="modal-close" onclick="hideModal('modal-create-tenant')">✕</button>
+        </div>
+        <form onsubmit="handleCreateTenant(event)">
+            <label class="field-label">Display Name</label>
+            <input class="field" id="tenant-name" required placeholder="e.g. Engineering">
+            <label class="field-label">Slug</label>
+            <input class="field" id="tenant-slug" required placeholder="e.g. engineering" pattern="[a-z0-9\-]+"
+                   title="Lowercase letters, numbers, and hyphens only">
+            <button class="btn-primary" type="submit">Create</button>
+        </form>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<div id="modal-upload" class="modal-overlay hidden" onclick="closeModal(event, 'modal-upload')">
+    <div class="modal-card modal-wide" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">Upload Documents</h3>
+            <span class="modal-subtitle" id="upload-kb-label"></span>
+            <button class="modal-close" onclick="hideModal('modal-upload')">✕</button>
+        </div>
+        <div class="upload-area">
+            <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-picker').click()">
+                <input type="file" id="file-picker" accept=".md" multiple hidden>
+                <div class="drop-icon">📄</div>
+                <div class="drop-text">Drop <strong>.md</strong> files here or click to browse</div>
+                <div class="drop-hint">Only Markdown (.md) files are accepted</div>
+            </div>
+            <div id="file-queue" class="file-queue hidden">
+                <div class="queue-header">
+                    <span class="queue-count" id="queue-count"></span>
+                    <button class="btn-clear" onclick="clearQueue()">Clear all</button>
+                </div>
+                <div id="queue-list" class="queue-list"></div>
+            </div>
+            <div id="upload-actions" class="upload-actions hidden">
+                <button class="btn-secondary" onclick="clearQueue()">Cancel</button>
+                <button class="btn-primary btn-upload-go" id="btn-upload" onclick="handleUpload()">Upload & Index</button>
+            </div>
+            <div id="upload-results" class="upload-results hidden"></div>
+        </div>
+    </div>
+</div>
+
+<!-- KB Detail Modal -->
+<div id="modal-kb-detail" class="modal-overlay hidden" onclick="closeModal(event, 'modal-kb-detail')">
+    <div class="modal-card modal-wide" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title" id="kb-detail-title"></h3>
+            <button class="modal-close" onclick="hideModal('modal-kb-detail')">✕</button>
+        </div>
+        <div id="kb-detail-docs" class="kb-detail-docs"></div>
+        <div id="kb-detail-empty" class="empty-state small hidden">
+            <div class="empty-desc">No documents in this knowledge base</div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast-container" class="toast-container"></div>
+
+<script src="/static/admin.js"></script>
+</body>
+</html>

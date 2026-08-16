@@ -19,6 +19,10 @@ pyjwt
 bcrypt
 sqlalchemy
 psycopg[binary]
+asyncpg
 python-multipart
 aiofiles
 cachetools
+redis[hiredis]
+langgraph
+langchain-tavily

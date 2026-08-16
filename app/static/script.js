@@ -2,6 +2,8 @@ const API = '';
 let token = localStorage.getItem('token');
 let username = localStorage.getItem('username');
 let tenant = localStorage.getItem('tenant');
+let isAdmin = localStorage.getItem('is_admin') === 'true';
+let currentMode = 'rag';
 
 function api(path, opts = {}) {
     const headers = { ...opts.headers };
@@ -50,14 +52,17 @@ async function handleRegister(e) {
 
 function setAuth(data) {
     token = data.token; username = data.username; tenant = data.tenant;
+    isAdmin = !!data.is_admin;
     localStorage.setItem('token', token);
     localStorage.setItem('username', username);
     localStorage.setItem('tenant', tenant);
+    localStorage.setItem('is_admin', isAdmin ? 'true' : 'false');
     showApp();
 }
 
 function logout() {
     token = username = tenant = null;
+    isAdmin = false;
     localStorage.clear();
     location.reload();
 }
@@ -68,6 +73,21 @@ function showApp() {
     $('sb-tenant').textContent = tenant;
     $('sb-username').textContent = username;
     $('sb-avatar').textContent = username[0].toUpperCase();
+
+    // Show admin panel link for admin users
+    const existingAdminBtn = document.getElementById('btn-admin');
+    if (existingAdminBtn) existingAdminBtn.remove();
+    if (isAdmin) {
+        const foot = document.querySelector('.sb-foot');
+        const adminBtn = document.createElement('a');
+        adminBtn.id = 'btn-admin';
+        adminBtn.href = '/admin';
+        adminBtn.className = 'btn-admin-link';
+        adminBtn.textContent = '⚙ Admin';
+        adminBtn.title = 'Admin Panel';
+        foot.insertBefore(adminBtn, foot.querySelector('.btn-logout'));
+    }
+
     loadHistory();
     loadDocuments();
 }
@@ -80,6 +100,12 @@ function switchTab(tab) {
 
 function toggleSidebar() {
     $('sidebar').classList.toggle('collapsed');
+}
+
+function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    $('chat-input').placeholder = mode === 'online' ? 'Search the web…' : 'Ask your knowledge base…';
 }
 
 async function loadHistory() {
@@ -143,14 +169,23 @@ function clearMessages() {
     $('empty-state')?.remove();
 }
 
-function addMessage(role, text) {
+function addMessage(role, text, meta) {
     const el = $('messages');
     const es = $('empty-state');
     if (es) es.remove();
     const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const div = document.createElement('div');
     div.className = `msg ${role}`;
-    div.innerHTML = `<div class="msg-head"><span class="msg-sender">${role === 'user' ? 'You' : 'Assistant'}</span><span class="msg-time">${now}</span></div><div class="msg-body">${role === 'assistant' ? md(text) : esc(text)}</div>`;
+    let metaHtml = '';
+    if (role === 'assistant' && meta) {
+        const badgeClass = meta.cache_hit ? 'hit' : 'miss';
+        const badgeText = meta.cache_hit ? '⚡ Cached' : '🔄 Fresh';
+        const timeText = meta.response_time_ms != null ? `${meta.response_time_ms}ms` : '';
+        const modeLabel = meta.mode === 'online' ? '🌐 Online' : '📚 RAG';
+        const modeCls = meta.mode === 'online' ? 'online' : 'rag';
+        metaHtml = `<div class="msg-meta"><span class="mode-badge ${modeCls}">${modeLabel}</span><span class="cache-badge ${badgeClass}">${badgeText}</span>${timeText ? `<span class="response-time">${timeText}</span>` : ''}</div>`;
+    }
+    div.innerHTML = `<div class="msg-head"><span class="msg-sender">${role === 'user' ? 'You' : 'Assistant'}</span><span class="msg-time">${now}</span></div><div class="msg-body">${role === 'assistant' ? md(text) : esc(text)}</div>${metaHtml}`;
     el.appendChild(div);
     el.scrollTop = el.scrollHeight;
 }
@@ -179,11 +214,11 @@ async function handleSend(e) {
     addMessage('user', q);
     showTyping();
     try {
-        const res = await api('/api/chat', { method: 'POST', body: JSON.stringify({ question: q }) });
+        const res = await api('/api/chat', { method: 'POST', body: JSON.stringify({ question: q, mode: currentMode }) });
         hideTyping();
         if (!res.ok) { addMessage('assistant', 'Error: ' + (await res.json()).detail); return; }
         const data = await res.json();
-        addMessage('assistant', data.answer);
+        addMessage('assistant', data.answer, { cache_hit: data.cache_hit, response_time_ms: data.response_time_ms, mode: data.mode });
         loadHistory();
     } catch (err) {
         hideTyping();

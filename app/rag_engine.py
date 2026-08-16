@@ -1,5 +1,11 @@
+from __future__ import annotations
+
+import logging
+import time
 from pathlib import Path
 from datetime import datetime
+from typing import List
+
 from cachetools import TTLCache
 from langchain.chat_models import init_chat_model
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -14,13 +20,18 @@ from langchain_classic.retrievers import ContextualCompressionRetriever
 from langchain_classic.storage import LocalFileStore
 from langchain_classic.embeddings import CacheBackedEmbeddings
 from langchain_classic.indexes import SQLRecordManager, index
+from langchain_core.callbacks import CallbackManagerForRetrieverRun
+from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.retrievers import BaseRetriever
 from langchain_core.output_parsers import StrOutputParser
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchAny
 from langchain_qdrant import QdrantVectorStore
-from app.config import QDRANT_URL, QDRANT_API_KEY, POSTGRES_DB_URL
+from app.config import QDRANT_URL, QDRANT_API_KEY, POSTGRES_SYNC_DB_URL
+from app.cache import cache
+
+logger = logging.getLogger(__name__)
 
 embeddings = None
 cache_embeddings = None
@@ -41,6 +52,64 @@ RAG_PROMPT = ChatPromptTemplate.from_messages([
      "Context:\n{context}"),
     ("human", "{question}"),
 ])
+
+HYDE_PROMPT = ChatPromptTemplate.from_messages([
+    ("system",
+     "You are an internal knowledge-base author.  Given a question, write a "
+     "detailed, factual passage (150-250 words) that directly answers it.  "
+     "Write as if this passage already exists in the organization's documentation.  "
+     "Do NOT mention the question itself, do NOT use phrases like "
+     "'this document explains…'.  Just write the content."),
+    ("human", "{question}"),
+])
+
+
+class HyDERetriever(BaseRetriever):
+    """Hypothetical Document Embeddings retriever.
+
+    1. Sends the user question to the LLM → gets a hypothetical answer passage.
+    2. Embeds that passage (not the question).
+    3. Uses the resulting vector for dense similarity search in Qdrant.
+
+    This produces embeddings that sit closer to real relevant chunks in vector
+    space, dramatically improving recall for short / ambiguous queries.
+    """
+
+    vector_store: QdrantVectorStore
+    llm: object
+    embeddings: object 
+    tenant: str = ""
+    k: int = 15
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    def _get_relevant_documents(
+        self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+    ) -> List[Document]:
+        hyde_chain = HYDE_PROMPT | self.llm | StrOutputParser()
+        hypothetical_doc = hyde_chain.invoke({"question": query})
+        logger.info(
+            "HyDE generated %d-char hypothetical doc for: %s…",
+            len(hypothetical_doc), query[:80],
+        )
+
+        hyde_embedding = self.embeddings.embed_query(hypothetical_doc)
+
+        qdrant_filter = Filter(
+            must=[
+                FieldCondition(
+                    key="metadata.tenant",
+                    match=MatchAny(any=[self.tenant]),
+                )
+            ]
+        )
+        results = self.vector_store.similarity_search_by_vector(
+            embedding=hyde_embedding,
+            k=self.k,
+            filter=qdrant_filter,
+        )
+        return results
 
 
 def init_models():
@@ -125,7 +194,7 @@ def load_and_process_documents(base_dir="sample_kb/kb"):
 def index_documents(chunks):
     record_manager = SQLRecordManager(
         namespace="qdrant/knowledge_base",
-        db_url=POSTGRES_DB_URL,
+        db_url=POSTGRES_SYNC_DB_URL,
     )
     record_manager.create_schema()
     return index(
@@ -144,27 +213,19 @@ def get_retriever(tenant: str):
     tenant_chunks = [doc for doc in all_chunks if doc.metadata.get("tenant") == tenant]
     if not tenant_chunks:
         tenant_chunks = all_chunks
-
     sparse_retriever = BM25Retriever.from_documents(tenant_chunks)
     sparse_retriever.k = 5
 
-    dense_retriever = vector_store.as_retriever(
-        search_type="similarity",
-        search_kwargs={
-            "k": 15,
-            "filter": Filter(
-                must=[
-                    FieldCondition(
-                        key="metadata.tenant",
-                        match=MatchAny(any=[tenant]),
-                    )
-                ]
-            ),
-        },
+    hyde_retriever = HyDERetriever(
+        vector_store=vector_store,
+        llm=llm_model,
+        embeddings=embeddings,
+        tenant=tenant,
+        k=15,
     )
 
     hybrid_retriever = EnsembleRetriever(
-        retrievers=[dense_retriever, sparse_retriever],
+        retrievers=[hyde_retriever, sparse_retriever],
         weights=[0.6, 0.4],
     )
 
@@ -181,18 +242,56 @@ def format_docs(docs):
     return "\n\n".join(f"[{i+1}] {d.page_content}" for i, d in enumerate(docs))
 
 
-def query_rag(question: str, tenant: str) -> str:
-    retriever = get_retriever(tenant)
-    rag_chain = (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
-        | RAG_PROMPT
-        | llm_model
-        | StrOutputParser()
-    )
-    return rag_chain.ainvoke(question)
+async def query_rag(question: str, tenant: str, mode: str = "rag") -> dict:
+    """Run the LangGraph agent with Redis cache.
+
+    The agent routes to either the RAG pipeline or Tavily online search
+    based on the user-selected mode.
+
+    Returns a dict with:
+      - answer: the LLM's response
+      - cache_hit: whether the answer came from cache
+      - response_time_ms: wall-clock time in milliseconds
+      - mode: which search mode was used
+    """
+    from app.agent import agent
+
+    t0 = time.perf_counter()
+
+    cache_key = f"{mode}::{question}"
+
+    cached_answer = await cache.get(cache_key, tenant)
+    if cached_answer is not None:
+        elapsed = round((time.perf_counter() - t0) * 1000, 1)
+        logger.info("Cache HIT [%s/%s] %.1fms — %s…", tenant, mode, elapsed, question[:60])
+        return {
+            "answer": cached_answer,
+            "cache_hit": True,
+            "response_time_ms": elapsed,
+            "mode": mode,
+        }
+
+    result = await agent.ainvoke({
+        "question": question,
+        "tenant": tenant,
+        "mode": mode,
+    })
+    answer = result["answer"]
+
+    elapsed = round((time.perf_counter() - t0) * 1000, 1)
+    logger.info("Cache MISS [%s/%s] %.1fms — %s…", tenant, mode, elapsed, question[:60])
+
+    await cache.set(cache_key, tenant, answer)
+
+    return {
+        "answer": answer,
+        "cache_hit": False,
+        "response_time_ms": elapsed,
+        "mode": mode,
+    }
 
 
-def process_uploaded_document(file_path: str, tenant: str):
+async def process_uploaded_document(file_path: str, tenant: str):
     loader = TextLoader(file_path)
     docs = loader.load()
 
@@ -243,5 +342,8 @@ def process_uploaded_document(file_path: str, tenant: str):
 
     if tenant in retriever_cache:
         del retriever_cache[tenant]
+
+    invalidated = await cache.invalidate_tenant(tenant)
+    logger.info("Invalidated %d cached answers after upload for tenant '%s'", invalidated, tenant)
 
     return len(new_chunks)

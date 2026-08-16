@@ -86,6 +86,14 @@
             </div>
         </div>
         <div class="input-area">
+            <div class="mode-toggle" id="mode-toggle">
+                <button class="mode-btn active" data-mode="rag" onclick="setMode('rag')">
+                    <span class="mode-icon">📚</span> RAG
+                </button>
+                <button class="mode-btn" data-mode="online" onclick="setMode('online')">
+                    <span class="mode-icon">🌐</span> Online
+                </button>
+            </div>
             <form class="input-row" id="chat-form" onsubmit="handleSend(event)">
                 <input class="input-field" id="chat-input" placeholder="Ask a question…" autocomplete="off">
                 <button class="btn-send" type="submit" id="btn-send">→</button>

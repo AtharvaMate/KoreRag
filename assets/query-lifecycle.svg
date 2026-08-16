@@ -1,63 +1,117 @@
-<svg width="100%" viewBox="0 0 680 500" role="img" style="" xmlns="http://www.w3.org/2000/svg">
-<title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Inner working of a NexusRAG query</title>
-<desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">A user query fans out with varying relevance weight to five retrieved candidate chunks from hybrid dense and sparse search; the top three highest-weighted chunks pass into a cross-encoder reranker, then an LLM generation stage, producing a cited final answer.</desc>
-<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0a" />
+      <stop offset="100%" stop-color="#141414" />
+    </linearGradient>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-<rect x="270" y="30" width="140" height="46" rx="8" stroke-width="0.5" style="fill:rgb(230, 241, 251);stroke:rgb(24, 95, 165);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="340" y="46" text-anchor="middle" dominant-baseline="central" style="fill:rgb(12, 68, 124);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Query</text>
-<text x="340" y="64" text-anchor="middle" dominant-baseline="central" style="fill:rgb(24, 95, 165);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">User question</text>
-</g>
+    <!-- Node Gradients -->
+    <linearGradient id="node-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#334155" />
+    </linearGradient>
 
-<line stroke="#D85A30" stroke-linecap="round" x1="340" y1="76" x2="108" y2="140" stroke-width="1" opacity="0.2" style="fill:rgb(0, 0, 0);stroke:rgb(216, 90, 48);color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:round;stroke-linejoin:miter;opacity:0.2;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line stroke="#D85A30" stroke-linecap="round" x1="340" y1="76" x2="224" y2="140" stroke-width="3" opacity="0.55" style="fill:rgb(0, 0, 0);stroke:rgb(216, 90, 48);color:rgb(11, 11, 11);stroke-width:3px;stroke-linecap:round;stroke-linejoin:miter;opacity:0.55;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line stroke="#D85A30" stroke-linecap="round" x1="340" y1="76" x2="340" y2="140" stroke-width="4.5" opacity="1" style="fill:rgb(0, 0, 0);stroke:rgb(216, 90, 48);color:rgb(11, 11, 11);stroke-width:4.5px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line stroke="#D85A30" stroke-linecap="round" x1="340" y1="76" x2="456" y2="140" stroke-width="3.5" opacity="0.7" style="fill:rgb(0, 0, 0);stroke:rgb(216, 90, 48);color:rgb(11, 11, 11);stroke-width:3.5px;stroke-linecap:round;stroke-linejoin:miter;opacity:0.7;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line stroke="#D85A30" stroke-linecap="round" x1="340" y1="76" x2="572" y2="140" stroke-width="1" opacity="0.25" style="fill:rgb(0, 0, 0);stroke:rgb(216, 90, 48);color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:round;stroke-linejoin:miter;opacity:0.25;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+    <linearGradient id="highlight-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"><rect x="58" y="140" width="100" height="44" rx="6" stroke-width="0.5" style="fill:rgb(241, 239, 232);stroke:rgb(95, 94, 90);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="108" y="156" text-anchor="middle" dominant-baseline="central" style="fill:rgb(95, 94, 90);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Chunk 1</text>
-<text x="108" y="172" text-anchor="middle" dominant-baseline="central" style="fill:rgb(95, 94, 90);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">low score</text></g>
+    <linearGradient id="llm-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"><rect x="174" y="140" width="100" height="44" rx="6" stroke-width="1" style="fill:rgb(250, 236, 231);stroke:rgb(153, 60, 29);color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="224" y="156" text-anchor="middle" dominant-baseline="central" style="fill:rgb(113, 43, 19);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Chunk 2</text>
-<text x="224" y="172" text-anchor="middle" dominant-baseline="central" style="fill:rgb(153, 60, 29);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">selected</text></g>
+    <!-- Glowing Lines -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"><rect x="290" y="140" width="100" height="44" rx="6" stroke-width="1" style="fill:rgb(250, 236, 231);stroke:rgb(153, 60, 29);color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="340" y="156" text-anchor="middle" dominant-baseline="central" style="fill:rgb(113, 43, 19);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Chunk 3</text>
-<text x="340" y="172" text-anchor="middle" dominant-baseline="central" style="fill:rgb(153, 60, 29);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">top match</text></g>
+    <!-- Box Shadow -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"><rect x="406" y="140" width="100" height="44" rx="6" stroke-width="1" style="fill:rgb(250, 236, 231);stroke:rgb(153, 60, 29);color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="456" y="156" text-anchor="middle" dominant-baseline="central" style="fill:rgb(113, 43, 19);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Chunk 4</text>
-<text x="456" y="172" text-anchor="middle" dominant-baseline="central" style="fill:rgb(153, 60, 29);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">selected</text></g>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+    </marker>
+    <marker id="arrowhead-highlight" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64ffda" />
+    </marker>
+  </defs>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"><rect x="522" y="140" width="100" height="44" rx="6" stroke-width="0.5" style="fill:rgb(241, 239, 232);stroke:rgb(95, 94, 90);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="572" y="156" text-anchor="middle" dominant-baseline="central" style="fill:rgb(95, 94, 90);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Chunk 5</text>
-<text x="572" y="172" text-anchor="middle" dominant-baseline="central" style="fill:rgb(95, 94, 90);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">low score</text></g>
+  <!-- Background -->
+  <rect width="900" height="450" fill="url(#bg-grad)" rx="16" />
 
-<path d="M224 184 L260 260" fill="none" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="340" y1="184" x2="340" y2="260" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<path d="M456 184 L420 260" fill="none" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- Grid Pattern overlay -->
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.03" stroke-width="1"/>
+  </pattern>
+  <rect width="900" height="450" fill="url(#grid)" rx="16" />
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-<rect x="220" y="260" width="240" height="48" rx="8" stroke-width="0.5" style="fill:rgb(250, 236, 231);stroke:rgb(153, 60, 29);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="340" y="278" text-anchor="middle" dominant-baseline="central" style="fill:rgb(113, 43, 19);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Rerank</text>
-<text x="340" y="296" text-anchor="middle" dominant-baseline="central" style="fill:rgb(153, 60, 29);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Cross-encoder scores top matches</text>
-</g>
+  <!-- Title -->
+  <text x="450" y="45" font-family="'Inter', sans-serif" font-size="22" font-weight="700" fill="#e2e8f0" text-anchor="middle" letter-spacing="1.5">QUERY LIFECYCLE: END-TO-END RAG FLOW</text>
+  <line x1="320" y1="60" x2="580" y2="60" stroke="#64ffda" stroke-width="2" />
 
-<line x1="340" y1="308" x2="340" y2="340" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- 1. Query Input -->
+  <g transform="translate(40, 150)" filter="url(#shadow)">
+    <rect width="140" height="80" rx="12" fill="url(#node-grad)" stroke="#3b82f6" stroke-width="2" />
+    <circle cx="70" cy="30" r="14" fill="#3b82f6" fill-opacity="0.2" stroke="#60a5fa" stroke-width="2" />
+    <text x="70" y="35" font-family="sans-serif" font-size="12" fill="#60a5fa" text-anchor="middle" font-weight="bold">Q</text>
+    <text x="70" y="65" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#f8fafc" text-anchor="middle">User Query</text>
+  </g>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-<rect x="230" y="340" width="220" height="48" rx="8" stroke-width="0.5" style="fill:rgb(238, 237, 254);stroke:rgb(83, 74, 183);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="340" y="358" text-anchor="middle" dominant-baseline="central" style="fill:rgb(60, 52, 137);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">LLM generation</text>
-<text x="340" y="376" text-anchor="middle" dominant-baseline="central" style="fill:rgb(83, 74, 183);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Prompt + context to Groq</text>
-</g>
+  <!-- Connection: Query to Hybrid Retrieval -->
+  <path d="M 180 190 L 250 190" fill="none" stroke="#64ffda" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrowhead-highlight)" filter="url(#glow)" />
+  <text x="215" y="180" font-family="'Inter', sans-serif" font-size="12" fill="#64ffda" text-anchor="middle">Embed</text>
 
-<line x1="340" y1="388" x2="340" y2="420" marker-end="url(#arrow)" style="fill:none;stroke:rgb(137, 135, 129);color:rgb(11, 11, 11);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- 2. Hybrid Retrieval -->
+  <g transform="translate(250, 100)" filter="url(#shadow)">
+    <rect width="180" height="180" rx="12" fill="url(#node-grad)" stroke="#8b5cf6" stroke-width="2" />
+    <text x="340" y="130" font-family="'Inter', sans-serif" font-size="16" font-weight="700" fill="#f8fafc" text-anchor="middle">Hybrid Retrieval</text>
+    
+    <rect x="270" y="150" width="140" height="40" rx="6" fill="#1e293b" stroke="#a78bfa" stroke-width="1" />
+    <text x="340" y="175" font-family="'Inter', sans-serif" font-size="13" fill="#cbd5e1" text-anchor="middle">Dense (Qdrant)</text>
 
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-<rect x="230" y="420" width="220" height="50" rx="8" stroke-width="0.5" style="fill:rgb(225, 245, 238);stroke:rgb(15, 110, 86);color:rgb(11, 11, 11);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="340" y="438" text-anchor="middle" dominant-baseline="central" style="fill:rgb(8, 80, 65);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Answer</text>
-<text x="340" y="456" text-anchor="middle" dominant-baseline="central" style="fill:rgb(15, 110, 86);stroke:none;color:rgb(11, 11, 11);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;anthropic-sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">Cited response [1][2][3]</text>
-</g>
+    <text x="340" y="210" font-family="'Inter', sans-serif" font-size="14" font-weight="bold" fill="#94a3b8" text-anchor="middle">+</text>
+
+    <rect x="270" y="220" width="140" height="40" rx="6" fill="#1e293b" stroke="#a78bfa" stroke-width="1" />
+    <text x="340" y="245" font-family="'Inter', sans-serif" font-size="13" fill="#cbd5e1" text-anchor="middle">Sparse (BM25)</text>
+  </g>
+
+  <!-- Connection: Retrieval to Reranker (Multiple chunks) -->
+  <path d="M 430 160 L 510 170" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowhead)" />
+  <path d="M 430 190 L 510 190" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowhead)" />
+  <path d="M 430 220 L 510 210" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowhead)" />
+  <text x="470" y="150" font-family="'Inter', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Top 15 Chunks</text>
+
+  <!-- 3. Reranker -->
+  <g transform="translate(510, 110)" filter="url(#shadow)">
+    <rect width="160" height="160" rx="12" fill="url(#node-grad)" stroke="#ec4899" stroke-width="2" />
+    <text x="590" y="145" font-family="'Inter', sans-serif" font-size="16" font-weight="700" fill="#f8fafc" text-anchor="middle">Reranker</text>
+    <text x="590" y="165" font-family="'Inter', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Cross-Encoder</text>
+    
+    <path d="M 550 190 L 630 190 M 560 210 L 620 210 M 570 230 L 610 230" fill="none" stroke="#ec4899" stroke-width="3" />
+    <polygon points="590,250 580,240 600,240" fill="#ec4899" />
+  </g>
+
+  <!-- Connection: Reranker to LLM -->
+  <path d="M 670 190 L 730 190" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead)" filter="url(#glow)"/>
+  <text x="700" y="180" font-family="'Inter', sans-serif" font-size="12" fill="#10b981" text-anchor="middle">Top 5 Context</text>
+
+  <!-- 4. LLM Generation -->
+  <g transform="translate(730, 130)" filter="url(#shadow)">
+    <rect width="140" height="120" rx="12" fill="url(#llm-grad)" stroke="#fbbf24" stroke-width="2" />
+    <text x="800" y="170" font-family="'Inter', sans-serif" font-size="20" font-weight="800" fill="#fff" text-anchor="middle">Groq</text>
+    <text x="800" y="195" font-family="'Inter', sans-serif" font-size="12" fill="#fef3c7" text-anchor="middle">LLM Generation</text>
+    
+    <rect x="750" y="210" width="100" height="20" rx="4" fill="#000" fill-opacity="0.3" />
+    <text x="800" y="224" font-family="'Inter', sans-serif" font-size="10" fill="#fff" text-anchor="middle">Prompt + Context</text>
+  </g>
+
+  <!-- Return Path to User -->
+  <path d="M 800 250 L 800 340 L 110 340 L 110 230" fill="none" stroke="#64ffda" stroke-width="2" stroke-dasharray="8,4" marker-end="url(#arrowhead-highlight)" filter="url(#glow)" />
+  <text x="450" y="330" font-family="'Inter', sans-serif" font-size="14" font-weight="bold" fill="#64ffda" text-anchor="middle">Final Answer (Synthesized &amp; Grounded)</text>
+
 </svg>

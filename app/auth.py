@@ -3,7 +3,9 @@ import bcrypt
 from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import JWT_SECRET, JWT_ALGORITHM, JWT_EXPIRY_HOURS
 from app.database import get_db, User
 
@@ -18,27 +20,40 @@ def verify_password(password: str, hashed: str) -> bool:
     return bcrypt.checkpw(password.encode(), hashed.encode())
 
 
-def create_token(user_id: int, username: str, tenant_slug: str) -> str:
+def create_token(user_id: int, username: str, tenant_slug: str, is_admin: bool = False) -> str:
     payload = {
-        "sub": user_id,
+        "sub": str(user_id),
         "username": username,
         "tenant": tenant_slug,
+        "is_admin": is_admin,
         "exp": datetime.now(timezone.utc) + timedelta(hours=JWT_EXPIRY_HOURS),
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-def get_current_user(
+async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     try:
         payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        user = db.query(User).filter(User.id == payload["sub"]).first()
+        result = await db.execute(
+            select(User).options(selectinload(User.tenant)).where(User.id == int(payload["sub"]))
+        )
+        user = result.scalar_one_or_none()
         if not user:
             raise HTTPException(status_code=401, detail="User not found")
         return user
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Invalid token: {type(e).__name__}: {e}")
+
+
+async def get_admin_user(user: User = Depends(get_current_user)):
+    """Dependency that ensures the current user is an admin."""
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user

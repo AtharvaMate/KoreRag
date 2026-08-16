@@ -12,19 +12,35 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
   app:
     build: .
     ports:
       - "8000:8000"
     depends_on:
       - db
+      - redis
     env_file:
       - .env
     environment:
-      POSTGRES_DB_URL: postgresql+psycopg://rag_user:rag_password@db:5432/rag_db
+      POSTGRES_DB_URL: postgresql+asyncpg://rag_user:rag_password@db:5432/rag_db
+      REDIS_URL: redis://redis:6379/0
     volumes:
       - ./sample_kb:/app/sample_kb
       - ./embedding_cache:/app/embedding_cache
 
 volumes:
   pgdata:
+  redisdata:
