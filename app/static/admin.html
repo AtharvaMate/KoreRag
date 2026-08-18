@@ -11,7 +11,6 @@
 </head>
 <body>
 
-<!-- Login Gate -->
 <div id="admin-login" class="login-screen">
     <div class="login-card">
         <div class="login-stripe"></div>
@@ -31,9 +30,7 @@
     </div>
 </div>
 
-<!-- Admin Panel -->
 <div id="admin-panel" class="admin-panel hidden">
-    <!-- Top Bar -->
     <header class="admin-topbar">
         <div class="topbar-left">
             <a href="/" class="topbar-back" title="Back to Chat">←</a>
@@ -51,7 +48,6 @@
     </header>
 
     <div class="admin-body">
-        <!-- Sidebar Nav -->
         <nav class="admin-nav">
             <button class="nav-btn active" data-section="knowledge-bases" onclick="switchSection('knowledge-bases')">
                 <span class="nav-icon">📚</span> Knowledge Bases
@@ -61,9 +57,7 @@
             </button>
         </nav>
 
-        <!-- Content -->
         <main class="admin-content">
-            <!-- Knowledge Bases Section -->
             <section id="section-knowledge-bases" class="section">
                 <div class="section-header">
                     <div>
@@ -74,7 +68,6 @@
                 </div>
 
                 <div id="kb-grid" class="kb-grid">
-                    <!-- KB cards rendered by JS -->
                 </div>
                 <div id="kb-empty" class="empty-state">
                     <div class="empty-icon">📚</div>
@@ -83,7 +76,6 @@
                 </div>
             </section>
 
-            <!-- Tenants Section -->
             <section id="section-tenants" class="section hidden">
                 <div class="section-header">
                     <div>
@@ -94,7 +86,6 @@
                 </div>
 
                 <div id="tenant-list" class="tenant-list">
-                    <!-- Tenant rows rendered by JS -->
                 </div>
                 <div id="tenant-empty" class="empty-state">
                     <div class="empty-icon">🏢</div>
@@ -106,7 +97,6 @@
     </div>
 </div>
 
-<!-- Create KB Modal -->
 <div id="modal-create-kb" class="modal-overlay hidden" onclick="closeModal(event, 'modal-create-kb')">
     <div class="modal-card" onclick="event.stopPropagation()">
         <div class="modal-header">
@@ -123,7 +113,6 @@
     </div>
 </div>
 
-<!-- Create Tenant Modal -->
 <div id="modal-create-tenant" class="modal-overlay hidden" onclick="closeModal(event, 'modal-create-tenant')">
     <div class="modal-card" onclick="event.stopPropagation()">
         <div class="modal-header">
@@ -141,7 +130,6 @@
     </div>
 </div>
 
-<!-- Upload Modal -->
 <div id="modal-upload" class="modal-overlay hidden" onclick="closeModal(event, 'modal-upload')">
     <div class="modal-card modal-wide" onclick="event.stopPropagation()">
         <div class="modal-header">
@@ -172,7 +160,6 @@
     </div>
 </div>
 
-<!-- KB Detail Modal -->
 <div id="modal-kb-detail" class="modal-overlay hidden" onclick="closeModal(event, 'modal-kb-detail')">
     <div class="modal-card modal-wide" onclick="event.stopPropagation()">
         <div class="modal-header">
@@ -186,7 +173,6 @@
     </div>
 </div>
 
-<!-- Toast -->
 <div id="toast-container" class="toast-container"></div>
 
 <script src="/static/admin.js"></script>

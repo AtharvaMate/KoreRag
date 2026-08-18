@@ -74,7 +74,6 @@ function showApp() {
     $('sb-username').textContent = username;
     $('sb-avatar').textContent = username[0].toUpperCase();
 
-    // Show admin panel link for admin users
     const existingAdminBtn = document.getElementById('btn-admin');
     if (existingAdminBtn) existingAdminBtn.remove();
     if (isAdmin) {

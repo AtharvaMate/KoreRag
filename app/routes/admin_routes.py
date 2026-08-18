@@ -13,7 +13,6 @@ from app.config import UPLOAD_DIR
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 
-# ── Pydantic models ──────────────────────────────────────────────
 
 class CreateKBRequest(BaseModel):
     name: str
@@ -25,7 +24,6 @@ class CreateTenantRequest(BaseModel):
     slug: str
 
 
-# ── Tenant management ────────────────────────────────────────────
 
 @router.get("/tenants")
 async def list_tenants(
@@ -43,7 +41,6 @@ async def create_tenant(
     admin: User = Depends(get_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
-    # Check for duplicate slug
     result = await db.execute(select(Tenant).where(Tenant.slug == req.slug))
     if result.scalar_one_or_none():
         raise HTTPException(400, "Tenant slug already exists")
@@ -66,9 +63,7 @@ async def delete_tenant(
     if not tenant:
         raise HTTPException(404, "Tenant not found")
 
-    # Prevent deleting the tenant that the admin user belongs to
     if admin.tenant_id == tenant_id:
-        # Reassign admin to another tenant before proceeding
         other_tenant_result = await db.execute(
             select(Tenant).where(Tenant.id != tenant_id).limit(1)
         )
@@ -81,14 +76,12 @@ async def delete_tenant(
         admin.tenant_id = other_tenant.id
         await db.flush()
 
-    # Cascade-delete all dependent records (skip the admin user)
     from app.database import ChatMessage
     for model in [ChatMessage, Document, KnowledgeBase]:
         rows = await db.execute(select(model).where(model.tenant_id == tenant_id))
         for row in rows.scalars().all():
             await db.delete(row)
 
-    # Delete non-admin users on this tenant
     user_rows = await db.execute(
         select(User).where(User.tenant_id == tenant_id, User.id != admin.id)
     )
@@ -100,7 +93,6 @@ async def delete_tenant(
     return {"ok": True}
 
 
-# ── Knowledge Base management ────────────────────────────────────
 
 @router.get("/knowledge-bases")
 async def list_knowledge_bases(
@@ -117,7 +109,6 @@ async def list_knowledge_bases(
 
     items = []
     for kb in kbs:
-        # Get actual document count
         doc_count_result = await db.execute(
             select(func.count(Document.id)).where(Document.kb_id == kb.id)
         )
@@ -139,13 +130,11 @@ async def create_knowledge_base(
     admin: User = Depends(get_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
-    # Find tenant
     result = await db.execute(select(Tenant).where(Tenant.slug == req.tenant_slug))
     tenant = result.scalar_one_or_none()
     if not tenant:
         raise HTTPException(400, "Invalid tenant slug")
 
-    # Check unique name per tenant
     result = await db.execute(
         select(KnowledgeBase).where(
             KnowledgeBase.name == req.name,
@@ -175,7 +164,6 @@ async def delete_knowledge_base(
     if not kb:
         raise HTTPException(404, "Knowledge base not found")
 
-    # Delete associated documents and files
     doc_result = await db.execute(select(Document).where(Document.kb_id == kb_id))
     docs = doc_result.scalars().all()
     for doc in docs:
@@ -188,7 +176,6 @@ async def delete_knowledge_base(
     return {"ok": True}
 
 
-# ── File upload ──────────────────────────────────────────────────
 
 def _validate_md_file(filename: str):
     """Strictly validate that the file has a .md extension."""
@@ -206,7 +193,6 @@ async def upload_to_kb(
     """Upload a single .md file to a specific knowledge base."""
     _validate_md_file(file.filename)
 
-    # Fetch KB with tenant
     result = await db.execute(
         select(KnowledgeBase).options(selectinload(KnowledgeBase.tenant)).where(KnowledgeBase.id == kb_id)
     )
@@ -263,11 +249,9 @@ async def bulk_upload_to_kb(
     if not files:
         raise HTTPException(400, "No files provided")
 
-    # Validate all files first before processing any
     for f in files:
         _validate_md_file(f.filename)
 
-    # Fetch KB with tenant
     result = await db.execute(
         select(KnowledgeBase).options(selectinload(KnowledgeBase.tenant)).where(KnowledgeBase.id == kb_id)
     )
@@ -329,7 +313,6 @@ async def bulk_upload_to_kb(
     }
 
 
-# ── KB documents listing ─────────────────────────────────────────
 
 @router.get("/knowledge-bases/{kb_id}/documents")
 async def list_kb_documents(

@@ -32,10 +32,10 @@ class AgentState(TypedDict):
     """Typed state flowing through the LangGraph nodes."""
     question: str
     tenant: str
-    mode: str           # "rag" | "online"
-    context: str        # formatted retrieval results
-    sources: list       # source metadata for provenance
-    answer: str         # final LLM-generated response
+    mode: str
+    context: str
+    sources: list
+    answer: str
 
 
 RAG_PROMPT = ChatPromptTemplate.from_messages([

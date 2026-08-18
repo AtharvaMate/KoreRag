@@ -1,12 +1,10 @@
-// ── State ────────────────────────────────────────────────────
 let token = localStorage.getItem('token');
 let username = localStorage.getItem('username');
 let isAdmin = localStorage.getItem('is_admin') === 'true';
-let currentTenantFilter = '';  // '' = all tenants
+let currentTenantFilter = '';  
 let uploadTargetKbId = null;
 let fileQueue = [];
 
-// ── API helper ───────────────────────────────────────────────
 function api(path, opts = {}) {
     const headers = { ...opts.headers };
     if (token) headers['Authorization'] = 'Bearer ' + token;
@@ -16,7 +14,6 @@ function api(path, opts = {}) {
 
 function $(id) { return document.getElementById(id); }
 
-// ── Toast ────────────────────────────────────────────────────
 function showToast(message, type = 'info') {
     const container = $('toast-container');
     const toast = document.createElement('div');
@@ -31,7 +28,6 @@ function showToast(message, type = 'info') {
     }, 3500);
 }
 
-// ── Auth ─────────────────────────────────────────────────────
 async function handleAdminLogin(e) {
     e.preventDefault();
     const btn = $('login-btn');
@@ -89,7 +85,6 @@ async function showAdminPanel() {
     await loadKnowledgeBases();
 }
 
-// ── Tenant Management ────────────────────────────────────────
 let allTenants = [];
 
 async function loadTenants() {
@@ -131,12 +126,10 @@ function renderTenantList() {
 }
 
 function renderTenantDropdowns() {
-    // Topbar tenant switcher
     const sel = $('tenant-select');
     sel.innerHTML = `<option value="">All Tenants</option>` +
         allTenants.map(t => `<option value="${t.slug}" ${t.slug === currentTenantFilter ? 'selected' : ''}>${t.name}</option>`).join('');
 
-    // KB creation modal
     const kbTenantSel = $('kb-tenant');
     kbTenantSel.innerHTML = allTenants.map(t => `<option value="${t.slug}">${t.name}</option>`).join('');
 }
@@ -189,7 +182,6 @@ async function deleteTenant(id, name) {
     await loadKnowledgeBases();
 }
 
-// ── Knowledge Base Management ────────────────────────────────
 let allKBs = [];
 
 async function loadKnowledgeBases() {
@@ -316,7 +308,6 @@ async function viewKBDocuments(kbId, kbName) {
     }).join('');
 }
 
-// ── Upload ───────────────────────────────────────────────────
 
 function openUploadModal(kbId, kbName) {
     uploadTargetKbId = kbId;
@@ -342,7 +333,6 @@ function addFiles(files) {
             rejected++;
             continue;
         }
-        // Avoid duplicates
         if (fileQueue.some(f => f.name === file.name)) continue;
         fileQueue.push(file);
     }
@@ -388,7 +378,6 @@ async function handleUpload() {
 
     try {
         if (fileQueue.length === 1) {
-            // Single file upload
             const formData = new FormData();
             formData.append('file', fileQueue[0]);
 
@@ -412,7 +401,6 @@ async function handleUpload() {
             });
             showToast('File uploaded and indexed successfully', 'success');
         } else {
-            // Bulk upload
             const formData = new FormData();
             for (const file of fileQueue) {
                 formData.append('files', file);
@@ -439,7 +427,6 @@ async function handleUpload() {
             }
         }
 
-        // Mark queue items with status
         fileQueue = [];
         $('file-queue').classList.add('hidden');
         $('upload-actions').classList.add('hidden');
@@ -462,7 +449,6 @@ function showUploadResults(data) {
         ).join('<br>')}</div>`;
 }
 
-// ── Drag & Drop ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     const dropZone = $('drop-zone');
     if (!dropZone) return;
@@ -490,7 +476,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// ── Modal Helpers ────────────────────────────────────────────
 function hideModal(id) {
     $(id).classList.add('hidden');
 }
@@ -505,7 +490,6 @@ function switchSection(name) {
     $(`section-${name}`).classList.remove('hidden');
 }
 
-// ── Utils ────────────────────────────────────────────────────
 function esc(s) {
     if (!s) return '';
     const d = document.createElement('div');

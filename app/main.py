@@ -45,10 +45,9 @@ async def seed_admin():
         tenant_result = await db.execute(select(Tenant).limit(1))
         tenant = tenant_result.scalar_one_or_none()
         if not tenant:
-            return  # No tenants seeded yet — nothing to attach to
+            return
 
         if existing_admin is None:
-            # Case 1: admin user was deleted — re-create it
             admin = User(
                 username=ADMIN_USERNAME,
                 password_hash=hash_password(ADMIN_PASSWORD),
@@ -58,7 +57,6 @@ async def seed_admin():
             db.add(admin)
             await db.commit()
         else:
-            # Case 2: admin exists — make sure their tenant is still valid
             tenant_check = await db.execute(
                 select(Tenant).where(Tenant.id == existing_admin.tenant_id)
             )
