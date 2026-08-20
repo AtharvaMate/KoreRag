@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧠 Nexus RAG
+# 🧠 Kore RAG
 
 ### Enterprise-Grade Multi-Tenant Retrieval-Augmented Generation Platform
 
