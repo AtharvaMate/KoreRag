@@ -30,7 +30,7 @@ A production-ready API for document ingestion, hybrid semantic search, and conte
 
 ## 📖 Overview
 
-**Nexus RAG** is a production-oriented Retrieval-Augmented Generation platform built for **multi-tenant SaaS** environments. It goes beyond basic RAG by combining:
+**Kore RAG** is a production-oriented Retrieval-Augmented Generation platform built for **multi-tenant SaaS** environments. It goes beyond basic RAG by combining:
 
 - 🔬 **Hypothetical Document Embeddings (HyDE)** for superior query understanding
 - 🔀 **Hybrid retrieval** fusing dense vectors with BM25 sparse search
@@ -46,7 +46,7 @@ Every tenant's documents, embeddings, chat history, and cache entries are fully 
 ## ⚡ System Architecture
 
 <div align="center">
-  <img src="./assets/architecture.svg" alt="Nexus RAG System Architecture" width="850" />
+  <img src="./assets/architecture.svg" alt="Kore RAG System Architecture" width="850" />
 </div>
 
 <br/>
@@ -188,8 +188,8 @@ NexusRag/
 
 ```bash
 # Clone and setup
-git clone https://github.com/AtharvaMate/NexusRag.git
-cd NexusRag
+git clone https://github.com/AtharvaMate/KoreRag.git
+cd KoreRag
 python -m venv .venv
 .venv\Scripts\activate          # Linux/macOS: source .venv/bin/activate
 pip install -r requirements.txt
@@ -205,8 +205,8 @@ uvicorn app.main:app --reload --port 8000
 ### Option 2 — Docker Compose (Recommended)
 
 ```bash
-git clone https://github.com/AtharvaMate/NexusRag.git
-cd NexusRag
+git clone https://github.com/AtharvaMate/KoreRag.git
+cd KoreRag
 cp .env.example .env
 # Edit .env with your Groq + Qdrant credentials
 
@@ -298,7 +298,7 @@ Results are written to `ragas_eval_results.csv` after each evaluation run.
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
-Feel free to check the [issues page](https://github.com/AtharvaMate/NexusRag/issues).
+Feel free to check the [issues page](https://github.com/AtharvaMate/KoreRag/issues).
 
 1. Fork the project
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
