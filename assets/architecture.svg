@@ -1,5 +1,5 @@
 <svg width="100%" viewBox="0 0 960 900" role="img" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;">
-  <title>Nexus RAG — Full System Architecture</title>
+  <title>Kore RAG — Full System Architecture</title>
   <desc>End-to-end architecture: Client, FastAPI, LangGraph Agent routing to HyDE+Hybrid RAG or Tavily online search, with Redis cache, Qdrant, PostgreSQL, and cross-encoder reranking.</desc>
 
   <defs>
@@ -28,7 +28,7 @@
   <rect width="960" height="900" rx="14" fill="url(#bg)"/>
 
   <!-- ──── TITLE ──── -->
-  <text x="480" y="38" text-anchor="middle" fill="#e2e8f0" font-size="18" font-weight="700" letter-spacing="1.5">NEXUS RAG — SYSTEM ARCHITECTURE</text>
+  <text x="480" y="38" text-anchor="middle" fill="#e2e8f0" font-size="18" font-weight="700" letter-spacing="1.5">KORE RAG — SYSTEM ARCHITECTURE</text>
   <line x1="310" y1="50" x2="650" y2="50" stroke="#334155" stroke-width="1"/>
 
   <!-- ════════════════ ROW 1: CLIENT ════════════════ -->
