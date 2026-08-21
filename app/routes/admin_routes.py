@@ -178,7 +178,6 @@ async def delete_knowledge_base(
 
 
 def _validate_md_file(filename: str):
-    """Strictly validate that the file has a .md extension."""
     if not filename or not filename.lower().endswith(".md"):
         raise HTTPException(400, f"Only .md files are allowed. Got: '{filename}'")
 
@@ -190,7 +189,6 @@ async def upload_to_kb(
     admin: User = Depends(get_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Upload a single .md file to a specific knowledge base."""
     _validate_md_file(file.filename)
 
     result = await db.execute(
@@ -245,7 +243,6 @@ async def bulk_upload_to_kb(
     admin: User = Depends(get_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Upload multiple .md files to a specific knowledge base."""
     if not files:
         raise HTTPException(400, "No files provided")
 

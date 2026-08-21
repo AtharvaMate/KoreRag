@@ -1,14 +1,3 @@
-"""
-Redis-backed LLM response cache.
-
-Uses content-addressed SHA-256 keys derived from normalized (question, tenant)
-pairs.  Stores JSON payloads so we can keep metadata (timestamp, tenant,
-question hash) alongside the cached answer for debugging / observability.
-
-Every public method degrades gracefully — if Redis is down the app keeps
-working, just without the cache speed-up.
-"""
-
 from __future__ import annotations
 
 import hashlib
@@ -28,7 +17,6 @@ KEY_PREFIX = "llm_cache"
 
 @dataclass
 class CacheStats:
-    """Mutable hit / miss counters tracked in-process (not in Redis)."""
     hits: int = 0
     misses: int = 0
 
@@ -42,7 +30,6 @@ class CacheStats:
 
 
 class RedisCache:
-    """Async Redis cache for LLM responses with tenant-level invalidation."""
 
     def __init__(self, url: str = REDIS_URL, default_ttl: int = REDIS_CACHE_TTL):
         self._url = url
@@ -52,7 +39,6 @@ class RedisCache:
         self._connected = False
 
     async def connect(self) -> None:
-        """Open the Redis connection pool.  Safe to call repeatedly."""
         try:
             self._client = redis.from_url(
                 self._url,
@@ -69,7 +55,6 @@ class RedisCache:
             logger.warning("Redis unavailable — LLM cache disabled", exc_info=True)
 
     async def close(self) -> None:
-        """Drain and close the connection pool."""
         if self._client:
             await self._client.aclose()
             self._connected = False
@@ -81,19 +66,15 @@ class RedisCache:
 
     @staticmethod
     def _normalize(text: str) -> str:
-        """Lowercase, strip, collapse whitespace — so semantically identical
-        prompts always share the same cache key."""
         return " ".join(text.lower().split())
 
     @classmethod
     def _make_key(cls, question: str, tenant: str) -> str:
-        """Deterministic SHA-256 content-addressed key."""
         normalized = f"{cls._normalize(tenant)}::{cls._normalize(question)}"
         digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
         return f"{KEY_PREFIX}:{tenant}:{digest}"
 
     async def get(self, question: str, tenant: str) -> Optional[str]:
-        """Return cached answer or None.  Never raises."""
         if not self._connected:
             self._stats.misses += 1
             return None
@@ -114,7 +95,6 @@ class RedisCache:
     async def set(
         self, question: str, tenant: str, answer: str, ttl: Optional[int] = None
     ) -> None:
-        """Store an answer.  Never raises."""
         if not self._connected:
             return
         try:
@@ -133,7 +113,6 @@ class RedisCache:
             logger.warning("Redis SET failed — answer not cached", exc_info=True)
 
     async def invalidate_tenant(self, tenant: str) -> int:
-        """Delete every cached answer for *tenant*.  Returns count deleted."""
         if not self._connected:
             return 0
         try:
@@ -149,7 +128,6 @@ class RedisCache:
             return 0
 
     async def get_stats(self) -> dict:
-        """Return in-process hit/miss counters plus Redis key count."""
         keys_count = 0
         if self._connected:
             try:

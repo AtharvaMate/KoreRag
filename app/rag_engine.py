@@ -243,17 +243,6 @@ def format_docs(docs):
 
 
 async def query_rag(question: str, tenant: str, mode: str = "rag") -> dict:
-    """Run the LangGraph agent with Redis cache.
-
-    The agent routes to either the RAG pipeline or Tavily online search
-    based on the user-selected mode.
-
-    Returns a dict with:
-      - answer: the LLM's response
-      - cache_hit: whether the answer came from cache
-      - response_time_ms: wall-clock time in milliseconds
-      - mode: which search mode was used
-    """
     from app.agent import agent
 
     t0 = time.perf_counter()
@@ -263,7 +252,6 @@ async def query_rag(question: str, tenant: str, mode: str = "rag") -> dict:
     cached_answer = await cache.get(cache_key, tenant)
     if cached_answer is not None:
         elapsed = round((time.perf_counter() - t0) * 1000, 1)
-        logger.info("Cache HIT [%s/%s] %.1fms — %s…", tenant, mode, elapsed, question[:60])
         return {
             "answer": cached_answer,
             "cache_hit": True,
@@ -279,7 +267,6 @@ async def query_rag(question: str, tenant: str, mode: str = "rag") -> dict:
     answer = result["answer"]
 
     elapsed = round((time.perf_counter() - t0) * 1000, 1)
-    logger.info("Cache MISS [%s/%s] %.1fms — %s…", tenant, mode, elapsed, question[:60])
 
     await cache.set(cache_key, tenant, answer)
 
@@ -343,7 +330,5 @@ async def process_uploaded_document(file_path: str, tenant: str):
     if tenant in retriever_cache:
         del retriever_cache[tenant]
 
-    invalidated = await cache.invalidate_tenant(tenant)
-    logger.info("Invalidated %d cached answers after upload for tenant '%s'", invalidated, tenant)
 
     return len(new_chunks)

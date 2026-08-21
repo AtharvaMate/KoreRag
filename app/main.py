@@ -29,13 +29,6 @@ async def seed_tenants():
 
 
 async def seed_admin():
-    """Create or repair the hardcoded admin user.
-
-    Handles three failure modes:
-      1. Admin user doesn't exist → create it.
-      2. Admin user exists but its tenant was deleted → reassign to a valid tenant.
-      3. Admin user exists and is healthy → no-op.
-    """
     async with SessionLocal() as db:
         result = await db.execute(
             select(User).where(User.username == ADMIN_USERNAME)

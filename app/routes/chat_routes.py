@@ -60,6 +60,5 @@ async def history(user: User = Depends(get_current_user), db: AsyncSession = Dep
 
 @router.get("/cache-stats")
 async def cache_stats(user: User = Depends(get_current_user)):
-    """Return Redis cache hit/miss statistics for observability."""
     stats = await cache.get_stats()
     return stats

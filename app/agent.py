@@ -1,20 +1,3 @@
-"""
-LangGraph agentic workflow for search mode routing.
-
-Implements a StateGraph that routes user queries to either:
-  - RAG pipeline (HyDE + hybrid retrieval from the knowledge base)
-  - Online search (Tavily web search for real-time information)
-
-The user picks the mode explicitly via the frontend toggle.
-Both paths converge on the same generate node for consistent
-cited answers.
-
-Graph:
-    START → route_query (conditional edge)
-        ├── "rag"    → retrieve_rag    → generate → END
-        └── "online" → retrieve_online → generate → END
-"""
-
 from __future__ import annotations
 
 import logging
@@ -29,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 class AgentState(TypedDict):
-    """Typed state flowing through the LangGraph nodes."""
     question: str
     tenant: str
     mode: str
@@ -64,7 +46,6 @@ ONLINE_PROMPT = ChatPromptTemplate.from_messages([
 
 
 def retrieve_rag(state: AgentState) -> dict:
-    """Run the HyDE + hybrid + rerank RAG pipeline."""
     from app.rag_engine import get_retriever, format_docs
 
     question = state["question"]
@@ -82,13 +63,10 @@ def retrieve_rag(state: AgentState) -> dict:
         }
         for doc in docs
     ]
-
-    logger.info("RAG retrieved %d docs for: %s…", len(docs), question[:60])
     return {"context": context, "sources": sources}
 
 
 def retrieve_online(state: AgentState) -> dict:
-    """Run Tavily web search and format results as numbered context."""
     question = state["question"]
 
     tavily = TavilySearch(max_results=5, topic="general")
@@ -107,13 +85,10 @@ def retrieve_online(state: AgentState) -> dict:
     else:
         context = f"[1] {results}"
         sources = [{"type": "online", "title": "Web Search", "url": ""}]
-
-    logger.info("Tavily returned %d results for: %s…", len(sources), question[:60])
     return {"context": context, "sources": sources}
 
 
 async def generate(state: AgentState) -> dict:
-    """Generate the final answer from retrieved context using the LLM."""
     from app.rag_engine import llm_model
 
     mode = state["mode"]
@@ -130,7 +105,6 @@ async def generate(state: AgentState) -> dict:
 
 
 def route_query(state: AgentState) -> Literal["retrieve_rag", "retrieve_online"]:
-    """Route to the appropriate retrieval node based on user-selected mode."""
     mode = state.get("mode", "rag")
     if mode == "online":
         return "retrieve_online"
@@ -138,15 +112,6 @@ def route_query(state: AgentState) -> Literal["retrieve_rag", "retrieve_online"]
 
 
 def build_agent_graph() -> StateGraph:
-    """Build and compile the LangGraph agent.
-
-    Returns a compiled graph that can be invoked with:
-        result = await graph.ainvoke({
-            "question": "...",
-            "tenant": "...",
-            "mode": "rag" | "online",
-        })
-    """
     graph = StateGraph(AgentState)
 
     graph.add_node("retrieve_rag", retrieve_rag)
